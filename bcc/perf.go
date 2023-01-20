@@ -55,7 +55,7 @@ const BPF_PERF_READER_PAGE_CNT = 8
 var byteOrder binary.ByteOrder
 var callbackRegister = make(map[uint64]*callbackData)
 var callbackIndex uint64
-var mu sync.Mutex
+var mu sync.RWMutex
 
 // In lack of binary.HostEndian ...
 func init() {
@@ -80,6 +80,8 @@ func unregisterCallback(i uint64) {
 }
 
 func lookupCallback(i uint64) *callbackData {
+	mu.RLock()
+	defer mu.RUnlock()
 	return callbackRegister[i]
 }
 
